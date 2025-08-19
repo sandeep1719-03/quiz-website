@@ -1,108 +1,50 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Simple JEE Quiz — Play</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Simple JEE Quiz</title>
 <link href="style.css" rel="stylesheet">
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div class="brand">
-        <div class="logo">JQ</div>
-        <div>
-          <h1>Simple JEE Quiz</h1>
-          <div class="small-muted">Upload question → friend answers → you mark correctness</div>
-        </div>
-      </div>
-      <div class="player-badge" id="playerName">Player: —</div>
-    </header>
-
-    <!-- Builder -->
-    <div class="card builder" id="builder">
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="logo">JQ</div>
       <div>
-        <label class="small">Upload question screenshot (optional)</label>
-        <div class="file-row">
-          <input id="imgInput" type="file" accept="image/*">
-        </div>
-        <div style="margin-top:8px">
-          <img id="preview" class="thumb" alt="Preview" style="display:none">
-        </div>
-      </div>
-
-      <div>
-        <label class="small">Options (A → D). Click the small ⭑ to mark the correct answer (background only).</label>
-        <div class="opts-grid">
-          <div class="opt-field" data-index="0">
-            <input id="opt0" type="text" placeholder="Option A" />
-            <button class="select-correct" data-index="0">⭑</button>
-          </div>
-          <div class="opt-field" data-index="1">
-            <input id="opt1" type="text" placeholder="Option B" />
-            <button class="select-correct" data-index="1">⭑</button>
-          </div>
-          <div class="opt-field" data-index="2">
-            <input id="opt2" type="text" placeholder="Option C" />
-            <button class="select-correct" data-index="2">⭑</button>
-          </div>
-          <div class="opt-field" data-index="3">
-            <input id="opt3" type="text" placeholder="Option D" />
-            <button class="select-correct" data-index="3">⭑</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="controls">
-        <button id="showBtn" class="btn primary">Show to Friend</button>
-        <button id="clearBtn" class="btn">Clear</button>
-        <button id="resetScore" class="btn warn">Reset Score</button>
+        <h1>Simple JEE Quiz</h1>
+        <div class="small-muted">Upload question → friend answers → mark correctness</div>
       </div>
     </div>
+    <div class="player-badge" id="playerName">Player: —</div>
+  </header>
 
-    <!-- Quiz view -->
-    <div id="quizView" class="card" style="display:none;">
-      <div class="info-row">
-        <div><strong id="qIndex">Question</strong></div>
-        <div><strong id="scoreDisplay">Score: 0</strong></div>
-      </div>
+  <!-- Builder -->
+  <div class="card builder" id="builder">
+    <label class="small">Upload question screenshot (optional)</label>
+    <input id="imgInput" type="file" accept="image/*">
+    <img id="preview" class="thumb" style="display:none">
 
-      <div class="q-image-wrap" style="margin-top:10px">
-        <img id="qImage" class="qimage" alt="Question image" style="display:none">
-      </div>
-
-      <div class="options-area" id="optionsArea"></div>
-
-      <div id="afterAnswer" style="display:none">
-        <div id="result" class="result"></div>
-
-        <div class="judge-area">
-          <label class="small" style="margin-right:8px">Host: pick the correct option</label>
-          <select id="hostSelect">
-            <option value="0">A</option>
-            <option value="1">B</option>
-            <option value="2">C</option>
-            <option value="3">D</option>
-          </select>
-          <button id="markBtn" class="btn primary">Mark correct</button>
-          <button id="nextQBtn" class="btn ghost" style="margin-left:auto">Next Question</button>
-        </div>
-      </div>
+    <label class="small">Options (A → D)</label>
+    <div class="opts-grid">
+      <div class="opt-field"><input id="opt0" type="text" placeholder="Option A"><button class="select-correct" data-index="0">⭑</button></div>
+      <div class="opt-field"><input id="opt1" type="text" placeholder="Option B"><button class="select-correct" data-index="1">⭑</button></div>
+      <div class="opt-field"><input id="opt2" type="text" placeholder="Option C"><button class="select-correct" data-index="2">⭑</button></div>
+      <div class="opt-field"><input id="opt3" type="text" placeholder="Option D"><button class="select-correct" data-index="3">⭑</button></div>
     </div>
+
+    <button id="uploadBtn" class="btn primary">Upload Question</button>
   </div>
 
-  <!-- name modal -->
-  <div id="nameModal" class="modal-back" style="display:none">
-    <div class="modal">
-      <h3>Enter your name</h3>
-      <input id="playerNameInput" placeholder="Your name" />
-      <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
-        <button id="saveNameBtn" class="btn primary">Save</button>
-      </div>
-      <p class="small-muted" style="margin-top:10px">This name is stored only in your browser.</p>
-    </div>
+  <!-- Quiz view (friend sees) -->
+  <div id="quizView" class="card" style="display:none;">
+    <div id="qIndex">Question</div>
+    <div id="scoreDisplay">Score: 0</div>
+    <img id="qImage" class="qimage" style="display:none">
+    <div class="options-area" id="optionsArea"></div>
   </div>
+</div>
 
-  <script type="module" src="script.js"></script>
+<script type="module" src="main.js"></script>
 </body>
 </html>
