@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #6dd5ed, #2193b0);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      max-width: 400px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 22px;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .option {
+      display: block;
+      background: #f0f0f0;
+      margin: 10px 0;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .option:hover {
+      background: #d0f0ff;
+    }
+    #status {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #2193b0;
+      color: white;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #176c80;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 id="question">Question will appear here</h1>
+    <div id="options"></div>
+    <p id="status"></p>
+    <p>Score: <span id="score">0</span></p>
+    <button onclick="nextQuestion()">Next Question</button>
+  </div>
+
+  <script>
+    let score = 0;
+    let selectedAnswer = null;
+
+    const questionElement = document.getElementById("question");
+    const optionsElement = document.getElementById("options");
+    const statusElement = document.getElementById("status");
+    const scoreElement = document.getElementById("score");
+
+    // Add a question manually (you type here each time)
+    function loadQuestion(q, opts) {
+      questionElement.innerText = q;
+      optionsElement.innerHTML = "";
+      statusElement.innerText = "";
+      selectedAnswer = null;
+      opts.forEach((opt, index) => {
+        let div = document.createElement("div");
+        div.className = "option";
+        div.innerText = opt;
+        div.onclick = () => {
+          selectedAnswer = opt;
+          statusElement.innerText = "Your friend selected: " + opt;
+          addJudgeButtons();
+        };
+        optionsElement.appendChild(div);
+      });
+    }
+
+    // Add judge buttons (you decide correct/incorrect)
+    function addJudgeButtons() {
+      statusElement.innerHTML += "<br><br><button onclick='markAnswer(true)'>Correct</button> <button onclick='markAnswer(false)'>Incorrect</button>";
+    }
+
+    // You judge
+    function markAnswer(isCorrect) {
+      if (isCorrect) {
+        score++;
+        scoreElement.innerText = score;
+        statusElement.innerHTML = "✅ Correct! Score updated.";
+      } else {
+        statusElement.innerHTML = "❌ Incorrect.";
+      }
+    }
+
+    // Change question manually
+    function nextQuestion() {
+      // Example new question
+      loadQuestion("What is the capital of France?", ["Berlin", "Madrid", "Paris", "Rome"]);
+    }
+
+    // Load first question
+    nextQuestion();
+  </script>
+</body>
+</html>
