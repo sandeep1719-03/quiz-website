@@ -1,51 +1,136 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Simple JEE Quiz</title>
-<link href="style.css" rel="stylesheet">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>JEE Quiz — Real-time</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  body{font-family:Inter,sans-serif;background:#eef2ff;margin:0;padding:20px;}
+  .card{background:white;padding:16px;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.08);margin-bottom:16px;}
+  input, button, select{padding:8px;margin:4px 0;border-radius:8px;border:1px solid #ccc;font-size:14px;}
+  button{cursor:pointer;}
+  img{max-width:100%;border-radius:12px;margin-top:8px;}
+  .option-btn{display:flex;align-items:center;gap:8px;padding:8px;border-radius:12px;border:1px solid #ccc;margin-top:6px;cursor:pointer;}
+  .option-btn.correct{background:rgba(16,185,129,0.2);}
+  .option-btn.wrong{background:rgba(239,68,68,0.2);}
+</style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="brand">
-      <div class="logo">JQ</div>
-      <div>
-        <h1>Simple JEE Quiz</h1>
-        <div class="small-muted">Upload question → friend answers → mark correctness</div>
-      </div>
-    </div>
-    <div class="player-badge" id="playerName">Player: —</div>
-  </header>
 
-  <!-- Builder -->
-  <div class="card builder" id="builder">
-    <label class="small">Upload question screenshot (optional)</label>
-    <input id="imgInput" type="file" accept="image/*">
-    <img id="preview" class="thumb" style="display:none">
-
-    <label class="small">Options (A → D)</label>
-    <div class="opts-grid">
-      <div class="opt-field"><input id="opt0" type="text" placeholder="Option A"><button class="select-correct" data-index="0">⭑</button></div>
-      <div class="opt-field"><input id="opt1" type="text" placeholder="Option B"><button class="select-correct" data-index="1">⭑</button></div>
-      <div class="opt-field"><input id="opt2" type="text" placeholder="Option C"><button class="select-correct" data-index="2">⭑</button></div>
-      <div class="opt-field"><input id="opt3" type="text" placeholder="Option D"><button class="select-correct" data-index="3">⭑</button></div>
-    </div>
-
-    <button id="uploadBtn" class="btn primary">Upload Question</button>
+<div class="card" id="builderCard">
+  <h2>Host: Upload Question</h2>
+  <input type="file" id="imgInput"><br>
+  <img id="preview" style="display:none;">
+  <div>
+    <input type="text" id="opt0" placeholder="Option A">
+    <input type="text" id="opt1" placeholder="Option B">
+    <input type="text" id="opt2" placeholder="Option C">
+    <input type="text" id="opt3" placeholder="Option D">
   </div>
-
-  <!-- Quiz view (friend sees) -->
-  <div id="quizView" class="card" style="display:none;">
-    <div id="qIndex">Question</div>
-    <div id="scoreDisplay">Score: 0</div>
-    <img id="qImage" class="qimage" style="display:none">
-    <div class="options-area" id="optionsArea"></div>
-  </div>
+  Correct option:
+  <select id="correctSelect">
+    <option value="0">A</option>
+    <option value="1">B</option>
+    <option value="2">C</option>
+    <option value="3">D</option>
+  </select>
+  <br>
+  <button id="uploadBtn">Upload Question (Hidden)</button>
+  <button id="showBtn">Show to Friend</button>
 </div>
 
-<script type="module" src="script.js"></script>
+<div class="card">
+  <h2>Friend View</h2>
+  <div id="friendView">Waiting for host...</div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.1/firebase-app.js";
+import { getFirestore, collection, addDoc, doc, updateDoc, query, where, onSnapshot, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.6.1/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.6.1/firebase-storage.js";
+
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const storage = getStorage(app);
+
+const imgInput = document.getElementById('imgInput');
+const preview = document.getElementById('preview');
+let selectedFile = null;
+
+imgInput.addEventListener('change', e=>{
+  selectedFile = e.target.files[0];
+  if(selectedFile){
+    const reader = new FileReader();
+    reader.onload = () => { preview.src = reader.result; preview.style.display='block'; }
+    reader.readAsDataURL(selectedFile);
+  }
+});
+
+document.getElementById('uploadBtn').addEventListener('click', async ()=>{
+  const options = [
+    document.getElementById('opt0').value.trim(),
+    document.getElementById('opt1').value.trim(),
+    document.getElementById('opt2').value.trim(),
+    document.getElementById('opt3').value.trim()
+  ];
+  const correct = Number(document.getElementById('correctSelect').value);
+  if(options.some(o=>'')||!selectedFile){ alert('Fill all options and select an image'); return; }
+
+  // Upload image to storage
+  const storageRef = ref(storage, 'questions/'+Date.now()+'_'+selectedFile.name);
+  await uploadBytes(storageRef, selectedFile);
+  const url = await getDownloadURL(storageRef);
+
+  // Add question to Firestore with visible=false
+  await addDoc(collection(db,'questions'),{
+    options,
+    correct,
+    imageurl: url,
+    visible: false,
+    timestamp: serverTimestamp()
+  });
+  alert('Question uploaded (hidden).');
+});
+
+document.getElementById('showBtn').addEventListener('click', async ()=>{
+  // Get the last uploaded question by timestamp and mark visible
+  const q = query(collection(db,'questions'), orderBy('timestamp','desc'));
+  onSnapshot(q, async snapshot=>{
+    const last = snapshot.docs[snapshot.docs.length-1];
+    if(last){
+      await updateDoc(doc(db,'questions',last.id), {visible:true});
+      alert('Question is now visible to friend!');
+    }
+  });
+});
+
+// Friend view: listen to visible questions
+const friendView = document.getElementById('friendView');
+const q = query(collection(db,'questions'), where('visible','==',true), orderBy('timestamp'));
+onSnapshot(q, snapshot=>{
+  friendView.innerHTML = '';
+  snapshot.docs.forEach(doc=>{
+    const data = doc.data();
+    const div = document.createElement('div');
+    div.className='card';
+    div.innerHTML = `
+      ${data.imageurl?'<img src="'+data.imageurl+'">':''}
+      ${data.options.map((o,i)=>'<div class="option-btn">'+['A','B','C','D'][i]+'. '+o+'</div>').join('')}
+    `;
+    friendView.appendChild(div);
+  });
+});
+</script>
 </body>
 </html>
-
