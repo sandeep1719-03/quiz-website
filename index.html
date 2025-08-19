@@ -4,80 +4,7 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Simple JEE Quiz — Play</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg: linear-gradient(180deg,#eef2ff 0%, #f7fbff 100%);
-    --card:#ffffff;
-    --muted:#6b7280;
-    --accent:#2563eb;
-    --accent-2:#7c3aed;
-    --ok:#16a34a;
-    --bad:#dc2626;
-    --border:#e6e9ef;
-    --radius:14px;
-    --glass: rgba(255,255,255,0.8);
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0; font-family:Inter,system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-    background:var(--bg); color:#0f172a; padding:18px; -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
-  }
-
-  .wrap{max-width:880px;margin:0 auto}
-  header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
-  .brand{display:flex;gap:12px;align-items:center}
-  .logo{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:white;display:flex;align-items:center;justify-content:center;font-weight:700;box-shadow:0 8px 26px rgba(37,99,235,0.12)}
-  h1{margin:0;font-size:18px}
-  .player-badge{background:var(--card);padding:8px 12px;border-radius:999px;border:1px solid var(--border);font-weight:700;color:var(--accent)}
-
-  .card{background:var(--card);border-radius:var(--radius);box-shadow:0 10px 30px rgba(12,15,30,0.04);border:1px solid var(--border);padding:16px}
-  .builder{display:grid;gap:12px}
-  label.small{display:block;color:var(--muted);font-size:13px;margin-bottom:6px}
-  .file-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  input[type="file"]{padding:6px}
-  .thumb{width:100%;max-height:360px;object-fit:contain;border-radius:10px;border:1px dashed var(--border);background:linear-gradient(180deg,#fff,#fbfdff);padding:8px}
-  .opts-grid{display:grid;gap:10px}
-  .opt-field{display:flex;gap:8px;align-items:center}
-  input[type="text"]{flex:1;padding:12px;border-radius:10px;border:1px solid var(--border);font-size:15px;background:linear-gradient(180deg,#fff,#fbfdff)}
-  .select-correct{padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:#fff;cursor:pointer;font-weight:700;color:var(--muted)}
-  .select-correct.selected{background:linear-gradient(90deg, rgba(34,197,94,0.12), rgba(236,252,243,0.02));color:var(--ok);border-color:rgba(34,197,94,0.18)}
-  .controls{display:flex;gap:8px;flex-wrap:wrap}
-  .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:white;cursor:pointer;font-weight:700}
-  .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;border-color:transparent}
-  .btn.ghost{background:transparent}
-  .btn.warn{background:#f97316;color:white;border-color:transparent}
-  .small-muted{font-size:13px;color:var(--muted);text-align:center;margin-top:8px}
-
-  /* Quiz view */
-  #quizView{display:none;margin-top:14px}
-  .q-image-wrap{display:flex;justify-content:center;margin-bottom:12px}
-  .qimage{width:100%; max-height:420px; object-fit:contain; border-radius:12px; border:1px solid var(--border); background:linear-gradient(180deg,#fff,#fbfdff);padding:8px}
-  .options-area{display:grid;gap:10px}
-  .opt-btn{display:flex;align-items:center;gap:12px;padding:14px;border-radius:12px;background:linear-gradient(180deg,#f8fafc,#fff);border:1px solid var(--border);font-size:16px;cursor:pointer;transition:all .16s}
-  .opt-btn:hover{transform:translateY(-3px)}
-  .opt-btn.disabled{opacity:.7;cursor:not-allowed;transform:none}
-  .opt-label{min-width:36px;font-weight:800;color:var(--accent)}
-  .opt-text{flex:1}
-  .opt-btn.correct{background:linear-gradient(90deg, rgba(16,185,129,0.08), rgba(220,255,240,0.02));border-color:rgba(16,185,129,0.22)}
-  .opt-btn.wrong{background:linear-gradient(90deg, rgba(239,68,68,0.06), rgba(255,240,240,0.02));border-color:rgba(239,68,68,0.12)}
-  .result{margin-top:10px;font-weight:800;display:flex;align-items:center;gap:8px}
-  .result.ok{color:var(--ok)} .result.bad{color:var(--bad)}
-
-  .judge-area{margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .info-row{display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:12px}
-
-  /* modal */
-  .modal-back{position:fixed;inset:0;background:rgba(12,15,30,0.45);display:flex;align-items:center;justify-content:center;z-index:99}
-  .modal{width:92%;max-width:420px;background:var(--card);padding:18px;border-radius:12px;border:1px solid var(--border);box-shadow:0 12px 36px rgba(12,15,30,0.2)}
-  .modal input{width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);font-size:15px}
-
-  @media (max-width:560px){
-    header{flex-direction:column;align-items:flex-start;gap:10px}
-    .logo{width:44px;height:44px}
-  }
-</style>
+<link href="style.css" rel="stylesheet">
 </head>
 <body>
   <div class="wrap">
@@ -99,14 +26,16 @@
         <div class="file-row">
           <input id="imgInput" type="file" accept="image/*">
         </div>
-        <div style="margin-top:8px"><img id="preview" class="thumb" alt="Preview" style="display:none"></div>
+        <div style="margin-top:8px">
+          <img id="preview" class="thumb" alt="Preview" style="display:none">
+        </div>
       </div>
 
       <div>
         <label class="small">Options (A → D). Click the small ⭑ to mark the correct answer (background only).</label>
         <div class="opts-grid">
           <div class="opt-field" data-index="0">
-            <input id="opt0" type="text" placeholder="Option A (e.g. 2x + 3)" />
+            <input id="opt0" type="text" placeholder="Option A" />
             <button class="select-correct" data-index="0">⭑</button>
           </div>
           <div class="opt-field" data-index="1">
@@ -129,11 +58,10 @@
         <button id="clearBtn" class="btn">Clear</button>
         <button id="resetScore" class="btn warn">Reset Score</button>
       </div>
-      <div class="small-muted">After the friend selects an option, you will pick the correct option below and click <b>Mark correct</b>.</div>
     </div>
 
     <!-- Quiz view -->
-    <div id="quizView" class="card" style="display:none; margin-top:14px">
+    <div id="quizView" class="card" style="display:none;">
       <div class="info-row">
         <div><strong id="qIndex">Question</strong></div>
         <div><strong id="scoreDisplay">Score: 0</strong></div>
@@ -160,8 +88,6 @@
           <button id="nextQBtn" class="btn ghost" style="margin-left:auto">Next Question</button>
         </div>
       </div>
-
-      <div style="margin-top:12px" class="small-muted">If the selection is correct, the player's score increases and is saved locally.</div>
     </div>
   </div>
 
@@ -177,206 +103,6 @@
     </div>
   </div>
 
-<script>
-(() => {
-  // DOM
-  const imgInput = document.getElementById('imgInput');
-  const preview = document.getElementById('preview');
-  const optEls = [document.getElementById('opt0'), document.getElementById('opt1'), document.getElementById('opt2'), document.getElementById('opt3')];
-  const selectBtns = Array.from(document.getElementsByClassName('select-correct'));
-  const showBtn = document.getElementById('showBtn');
-  const clearBtn = document.getElementById('clearBtn');
-  const resetScoreBtn = document.getElementById('resetScore');
-
-  const builder = document.getElementById('builder');
-  const quizView = document.getElementById('quizView');
-  const qImage = document.getElementById('qImage');
-  const optionsArea = document.getElementById('optionsArea');
-  const afterAnswer = document.getElementById('afterAnswer');
-  const hostSelect = document.getElementById('hostSelect');
-  const markBtn = document.getElementById('markBtn');
-  const nextQBtn = document.getElementById('nextQBtn');
-  const resultEl = document.getElementById('result');
-  const scoreDisplay = document.getElementById('scoreDisplay');
-  const nameModal = document.getElementById('nameModal');
-  const playerNameInput = document.getElementById('playerNameInput');
-  const saveNameBtn = document.getElementById('saveNameBtn');
-  const playerBadge = document.getElementById('playerName');
-
-  // state
-  let player = localStorage.getItem('jq_player_name') || '';
-  let score = Number(localStorage.getItem('jq_score') || 0);
-  let correctIndex = 0; // selected in builder (background)
-  let currentQuestion = null;
-  let friendChoice = null;
-
-  // init
-  function updatePlayerBadge(){
-    playerBadge.textContent = player ? player : 'Player: —';
-  }
-  updatePlayerBadge();
-  scoreDisplay.textContent = 'Score: ' + score;
-
-  function openNameModal(){
-    nameModal.style.display = 'flex';
-    playerNameInput.value = player || '';
-    playerNameInput.focus();
-  }
-  if(!player){
-    openNameModal();
-  }
-
-  saveNameBtn.addEventListener('click', ()=>{
-    const val = playerNameInput.value.trim();
-    if(!val){ alert('Enter a name'); return; }
-    player = val;
-    localStorage.setItem('jq_player_name', player);
-    updatePlayerBadge();
-    nameModal.style.display = 'none';
-  });
-
-  // preview image
-  imgInput.addEventListener('change', async () => {
-    const f = imgInput.files && imgInput.files[0];
-    if(!f){ preview.style.display='none'; preview.src=''; return; }
-    const r = new FileReader();
-    r.onload = () => { preview.src = r.result; preview.style.display='block'; };
-    r.readAsDataURL(f);
-  });
-
-  // builder select-correct UI
-  function updateSelectUI(){
-    selectBtns.forEach(btn => {
-      const idx = Number(btn.getAttribute('data-index'));
-      btn.classList.toggle('selected', idx === correctIndex);
-      btn.title = idx === correctIndex ? 'Marked correct' : 'Mark as correct';
-    });
-  }
-  selectBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      correctIndex = Number(btn.getAttribute('data-index'));
-      updateSelectUI();
-    });
-  });
-  updateSelectUI();
-
-  // clear button
-  clearBtn.addEventListener('click', ()=> {
-    imgInput.value=''; preview.src=''; preview.style.display='none';
-    optEls.forEach(i=>i.value='');
-    correctIndex = 0; updateSelectUI();
-  });
-
-  resetScoreBtn.addEventListener('click', ()=> {
-    if(confirm('Reset score to 0?')) {
-      score = 0;
-      localStorage.setItem('jq_score', score);
-      scoreDisplay.textContent = 'Score: ' + score;
-    }
-  });
-
-  // Show to friend (switch to quiz view)
-  showBtn.addEventListener('click', () => {
-    // validate options
-    const options = optEls.map(i=>i.value.trim());
-    if(options.some(v=>v==='')){ alert('Please fill all four options'); return; }
-    // build question object
-    currentQuestion = {
-      image: preview.src || null,
-      options,
-      correct: correctIndex
-    };
-    // render quiz view
-    renderQuiz();
-    builder.style.display = 'none';
-    quizView.style.display = 'block';
-  });
-
-  function renderQuiz(){
-    // reset
-    friendChoice = null;
-    afterAnswer.style.display = 'none';
-    resultEl.style.display = 'none';
-    optionsArea.innerHTML = '';
-
-    // image
-    if(currentQuestion.image){
-      qImage.src = currentQuestion.image;
-      qImage.style.display = 'block';
-    } else {
-      qImage.style.display = 'none';
-    }
-
-    // create option buttons
-    currentQuestion.options.forEach((t,i) => {
-      const b = document.createElement('button');
-      b.className = 'opt-btn';
-      b.innerHTML = `<span class="opt-label">${['A','B','C','D'][i]}</span><span class="opt-text">${escapeHtml(t)}</span>`;
-      b.onclick = () => onFriendSelect(b, i);
-      optionsArea.appendChild(b);
-    });
-    // set host select default to builder selected
-    hostSelect.value = currentQuestion.correct;
-    scoreDisplay.textContent = 'Score: ' + score;
-  }
-
-  function onFriendSelect(btn, index){
-    // disable other buttons
-    Array.from(document.querySelectorAll('.opt-btn')).forEach(x => { x.disabled = true; x.classList.add('disabled'); });
-    btn.classList.remove('disabled');
-    btn.style.boxShadow = '0 12px 26px rgba(0,0,0,0.06)';
-    friendChoice = index;
-    // reveal judge area
-    afterAnswer.style.display = 'block';
-    resultEl.style.display = 'none';
-  }
-
-  // host marks correct
-  markBtn.addEventListener('click', ()=>{
-    if(friendChoice === null){ alert('Friend has not selected an option yet.'); return; }
-    const hostPick = Number(hostSelect.value);
-    revealResult(friendChoice, hostPick);
-  });
-
-  function revealResult(chosen, correct){
-    const btns = Array.from(document.querySelectorAll('.opt-btn'));
-    btns.forEach(b => b.disabled = true);
-    // highlight chosen and correct
-    if(chosen === correct){
-      btns[chosen].classList.add('correct');
-      resultEl.className = 'result ok';
-      resultEl.textContent = '✅ Correct!';
-      score++;
-      localStorage.setItem('jq_score', score);
-      scoreDisplay.textContent = 'Score: ' + score;
-    } else {
-      btns[chosen].classList.add('wrong');
-      btns[correct].classList.add('correct');
-      resultEl.className = 'result bad';
-      resultEl.textContent = '❌ Wrong';
-    }
-    resultEl.style.display = 'flex';
-    // enable Next
-    nextQBtn.style.display = 'inline-flex';
-  }
-
-  nextQBtn.addEventListener('click', ()=> {
-    // reset to builder for next question
-    builder.style.display = '';
-    quizView.style.display = 'none';
-    // clear fields for next
-    imgInput.value=''; preview.src=''; preview.style.display='none';
-    optEls.forEach(i=>i.value='');
-    correctIndex = 0; updateSelectUI();
-    currentQuestion = null;
-    friendChoice = null;
-    nextQBtn.style.display = 'none';
-  });
-
-  // utility
-  function escapeHtml(s){ return (s+'').replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
-
-})();
-</script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
