@@ -1,49 +1,65 @@
-import { app, analytics } from "./firebase.js";
+import { db, storage } from './firebase.js';
+import { collection, addDoc, onSnapshot } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const imgInput = document.getElementById('imgInput');
 const preview = document.getElementById('preview');
-const optEls = [0,1,2,3].map(i=>document.getElementById('opt'+i));
+const optEls = [0,1,2,3].map(i => document.getElementById(`opt${i}`));
 const selectBtns = Array.from(document.getElementsByClassName('select-correct'));
-const showBtn = document.getElementById('showBtn');
-const clearBtn = document.getElementById('clearBtn');
-const resetScoreBtn = document.getElementById('resetScore');
+const uploadBtn = document.getElementById('uploadBtn');
 
-const builder = document.getElementById('builder');
-const quizView = document.getElementById('quizView');
-const qImage = document.getElementById('qImage');
-const optionsArea = document.getElementById('optionsArea');
-const afterAnswer = document.getElementById('afterAnswer');
-const hostSelect = document.getElementById('hostSelect');
-const markBtn = document.getElementById('markBtn');
-const nextQBtn = document.getElementById('nextQBtn');
-const resultEl = document.getElementById('result');
-const scoreDisplay = document.getElementById('scoreDisplay');
-const nameModal = document.getElementById('nameModal');
-const playerNameInput = document.getElementById('playerNameInput');
-const saveNameBtn = document.getElementById('saveNameBtn');
-const playerBadge = document.getElementById('playerName');
-
-let player = localStorage.getItem('jq_player_name') || '';
-let score = Number(localStorage.getItem('jq_score') || 0);
 let correctIndex = 0;
-let currentQuestion = null;
-let friendChoice = null;
+selectBtns.forEach(btn => btn.addEventListener('click', ()=>{
+    correctIndex = Number(btn.dataset.index);
+    selectBtns.forEach(b=>b.classList.toggle('selected', b===btn));
+}));
 
-function updatePlayerBadge(){
-  playerBadge.textContent = player ? "Player: " + player : 'Player: —';
-}
-updatePlayerBadge();
-scoreDisplay.textContent = 'Score: ' + score;
+imgInput.addEventListener('change', () => {
+    const file = imgInput.files[0];
+    if(file){
+        const reader = new FileReader();
+        reader.onload = e => { preview.src = e.target.result; preview.style.display='block'; };
+        reader.readAsDataURL(file);
+    } else { preview.style.display='none'; preview.src=''; }
+});
 
-function openNameModal(){
-  nameModal.style.display = 'flex';
-  playerNameInput.value = player || '';
-  playerNameInput.focus();
-}
-if(!player) openNameModal();
+uploadBtn.addEventListener('click', async () => {
+    const options = optEls.map(i => i.value.trim());
+    if(options.some(v=>!v)){ alert('Fill all options'); return; }
 
-saveNameBtn.addEventListener('click', ()=>{
-  const val = playerNameInput.value.trim();
-  if(!val){ alert('Enter a name'); return; }
-  player = val;
-  localStorage.setItem('jq_player_name',
+    let imageUrl = "";
+    const file = imgInput.files[0];
+    if(file){
+        const storageRef = ref(storage, `question-images/${Date.now()}-${file.name}`);
+        await uploadBytes(storageRef, file);
+        imageUrl = await getDownloadURL(storageRef);
+    }
+
+    await addDoc(collection(db, 'questions'), {
+        options, correct: correctIndex, imageUrl, answeredBy: {}
+    });
+    alert('Question uploaded!');
+    imgInput.value=''; preview.style.display='none'; optEls.forEach(i=>i.value=''); selectBtns.forEach(b=>b.classList.remove('selected'));
+});
+
+// Optional: show latest question in real-time
+const optionsArea = document.getElementById('optionsArea');
+const qImage = document.getElementById('qImage');
+const quizView = document.getElementById('quizView');
+
+onSnapshot(collection(db,'questions'), snapshot => {
+    const docs = snapshot.docs;
+    if(docs.length===0) return;
+    const latest = docs[docs.length-1].data();
+    quizView.style.display='block';
+    if(latest.imageUrl){ qImage.src = latest.imageUrl; qImage.style.display='block'; }
+    else qImage.style.display='none';
+
+    optionsArea.innerHTML = '';
+    latest.options.forEach((opt,i)=>{
+        const btn = document.createElement('button');
+        btn.textContent = `${['A','B','C','D'][i]}: ${opt}`;
+        btn.className='opt-btn';
+        optionsArea.appendChild(btn);
+    });
+});
